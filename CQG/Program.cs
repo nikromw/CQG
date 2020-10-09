@@ -94,8 +94,8 @@ namespace CQG
             char[] DictW = Dict.ToCharArray();
             int difference = 0;
             // сравнение большего слова с меньшим (словарное больше)
-            if (Dict.Length >= word.value.Length)
-            {
+            //if (Dict.Length >= word.value.Length)
+            //{
                 foreach (var L in errorW)
                 {
                     if (!DictW.Contains(L))
@@ -104,25 +104,26 @@ namespace CQG
                         if (difference >= 2) return;
                     }
                 }
+
                 //добавление словарного слова , на которое заменим позже
                 word.CorrectWordList.Add(Dict);
-                word.type = TypeOfError.insert;// словарное слово больше , значит вставка буквы
-            }
-            else
-            {
-                // сравнение большего слова с меньшим (словарное меньше)
-                foreach (var L in DictW)
-                {
-                    if (!errorW.Contains(L))
-                    {
-                        difference++;
-                        if (difference >= 2) return;
-                    }
-                }
-                //добавление словарного слова , на которое заменим позже
-                word.CorrectWordList.Add(Dict);
-                word.type = TypeOfError.delete; // словарное слово меньше , значит удаление 
-            }
+                //word.type = TypeOfError.insert;// словарное слово больше , значит вставка буквы
+            //}
+            //else
+            //{
+            //    // сравнение большего слова с меньшим (словарное меньше)
+            //    foreach (var L in DictW)
+            //    {
+            //        if (!errorW.Contains(L))
+            //        {
+            //            difference++;
+            //            if (difference >= 2) return;
+            //        }
+            //    }
+            //    //добавление словарного слова , на которое заменим позже
+            //    word.CorrectWordList.Add(Dict);
+            //    word.type = TypeOfError.delete; // словарное слово меньше , значит удаление 
+            //}
         }
 
     }
