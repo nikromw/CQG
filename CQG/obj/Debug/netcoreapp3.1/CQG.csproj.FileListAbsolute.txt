@@ -1,0 +1,13 @@
+C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.csprojAssemblyReference.cache
+C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.csproj.CoreCompileInputs.cache
+C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.AssemblyInfoInputs.cache
+C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.AssemblyInfo.cs
+C:\Users\Salvador\source\repos\CQG\CQG\bin\Debug\netcoreapp3.1\CQG.exe
+C:\Users\Salvador\source\repos\CQG\CQG\bin\Debug\netcoreapp3.1\CQG.deps.json
+C:\Users\Salvador\source\repos\CQG\CQG\bin\Debug\netcoreapp3.1\CQG.runtimeconfig.json
+C:\Users\Salvador\source\repos\CQG\CQG\bin\Debug\netcoreapp3.1\CQG.runtimeconfig.dev.json
+C:\Users\Salvador\source\repos\CQG\CQG\bin\Debug\netcoreapp3.1\CQG.dll
+C:\Users\Salvador\source\repos\CQG\CQG\bin\Debug\netcoreapp3.1\CQG.pdb
+C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.dll
+C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.pdb
+C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.genruntimeconfig.cache
