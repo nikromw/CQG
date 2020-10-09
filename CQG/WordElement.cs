@@ -18,9 +18,11 @@ namespace CQG
         public string value { get; set; }
         public TypeOfError type { get; set; }
         public int countOfMatches = 0;
+        public List<string> CorrectWordList = new List<string>();
         public WordElement(string _value)
         {
             value = _value;
+            type = TypeOfError.notFound;
         }
 
     }
