@@ -38,7 +38,7 @@ namespace CQG
                 }
                 foreach (var wordContent in Content)
                 {
-                    Console.Write(wordContent.value);
+                    Console.Write(wordContent.value + " ");
                     formatting++;
                     if (format.Contains(formatting)) Console.WriteLine();
                 }
@@ -222,9 +222,16 @@ namespace CQG
                         string finalString = "{";
                         foreach (var Word in word.CorrertWords)
                         {
-                            finalString += (  Word+ " ");
+                            if (Word == word.CorrertWords.Last())
+                            {
+                                finalString += Word;
+                            }
+                            else
+                            {
+                                finalString += Word + " ";
+                            }
                         }
-                        word.value = finalString + "} ";
+                        word.value = finalString + "}";
                     }
                     if (word.CorrertWords.Count() == 1)
                     {
