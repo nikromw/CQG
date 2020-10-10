@@ -99,7 +99,7 @@ namespace CQG
             int len = 0;
             int difference = 0;
             // сравнение большего слова с меньшим (словарное больше)
-          
+
             foreach (var L in errorW)
             {
                 if (!DictW.Contains(L))
@@ -126,17 +126,21 @@ namespace CQG
             {
                 word.type = TypeOfError.insert;
             }
-            else 
+            else
             {
                 word.type = TypeOfError.exactly;
             }
-     
+
         }
 
         static void SelectioWord(WordElement word)
         {
             // если не найдено совпадений в словаре 
-            if (word.AssumCorrectList.Count == 0 || word.AssumCorrectList == null) return;
+            if (word.AssumCorrectList.Count == 0 || word.AssumCorrectList == null)
+            {
+                word.value = "{" + word.value + "?" + "}";
+                return;
+            }
             if (word.AssumCorrectList.Count > 0)
             {
                 //если наше слово уже словарное , проверить на совпадения в найденых и просто завершиться 
@@ -147,18 +151,18 @@ namespace CQG
                 else
                 {
                     //сравниваем с найденными словами и смотрим отличие от них 
-                    for (var item = 0; item < word.AssumCorrectList.Count(); item++)
+                    for (var item = word.AssumCorrectList.Count()-1; item >=0; item--)
                     {
-                        if (word.value.Length < word.AssumCorrectList[item].Length)
+                        if (word.value.Length < word.AssumCorrectList[item].Length && word.type != TypeOfError.bothEdits)
                         {
                             List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
                             List<char> wordValue = new List<char>(word.value.ToCharArray());
-                            for (int letter = 0; letter < wordValue.Count(); letter++)
+                            for (int letter = assumeWord.Count() - 1; letter >= 0; letter--)
                             {
                                 if (wordValue.Contains(assumeWord[letter]))
                                 {
                                     wordValue.Remove(assumeWord[letter]);
-                                    wordValue.Remove(assumeWord[letter]);
+                                    assumeWord.Remove(assumeWord[letter]);
                                 }
                             }
                             if (assumeWord.Count == 1)
@@ -172,16 +176,16 @@ namespace CQG
                             }
 
                         }
-                        if (word.value.Length > word.AssumCorrectList[item].Length)
+                        if (word.value.Length > word.AssumCorrectList[item].Length && word.type != TypeOfError.bothEdits  )
                         {
                             List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
                             List<char> wordValue = new List<char>(word.value.ToCharArray());
-                            for (int letter = 0; letter < assumeWord.Count(); letter++)
+                            for (int letter = assumeWord.Count() - 1; letter >= 0; letter--)
                             {
                                 if (wordValue.Contains(assumeWord[letter]))
                                 {
                                     wordValue.Remove(assumeWord[letter]);
-                                    wordValue.Remove(assumeWord[letter]);
+                                    assumeWord.Remove(assumeWord[letter]);
                                 }
                             }
                             if (wordValue.Count == 1)
@@ -191,14 +195,14 @@ namespace CQG
                             }
                             else
                             {
-                                  word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
+                                word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
                             }
                         }
                         if (word.value.Length == word.AssumCorrectList[item].Length)
                         {
                             List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
                             List<char> wordValue = new List<char>(word.value.ToCharArray());
-                            for (int letter = assumeWord.Count()-1; letter >= 0; letter--)
+                            for (int letter = assumeWord.Count() - 1; letter >= 0; letter--)
                             {
                                 if (wordValue.Contains(assumeWord[letter]))
                                 {
@@ -206,14 +210,14 @@ namespace CQG
                                     assumeWord.Remove(assumeWord[letter]);
                                 }
                             }
-                            if (wordValue.Count == 0 || (word.AssumCorrectList.Count()==1 && wordValue.Count == 1))
+                            if (wordValue.Count == 0 || (word.AssumCorrectList.Count() == 1 && wordValue.Count == 1))
                             {
                                 word.CorrertWords.Add(word.AssumCorrectList[item]);
                                 word.type = TypeOfError.bothEdits;
                             }
                             else
                             {
-                                 word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
+                                word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
                                 continue;
                             }
                         }
@@ -223,16 +227,13 @@ namespace CQG
                         string finalString = "{";
                         foreach (var Word in word.CorrertWords)
                         {
-                            finalString += (" " + word);
+                            finalString += (  Word+ " ");
                         }
+                        word.value = finalString + "}";
                     }
                     if (word.CorrertWords.Count() == 1)
                     {
                         word.value = word.CorrertWords[0];
-                    }
-                    if (word.CorrertWords.Count() == 0 || word.CorrertWords == null)
-                    {
-                        word.value = "{" + word.value + "?" +"}";
                     }
                 }
             }
