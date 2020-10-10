@@ -30,18 +30,22 @@ namespace CQG
             }
             foreach (var wordContent in Content)
             {
-                if (wordContent.CorrectWordList.Count == 1)
+                SelectioWord(wordContent);
+            }
+            foreach (var wordContent in Content)
+            {
+                if (wordContent.AssumCorrectList.Count == 1)
                 {
-                    Console.WriteLine(wordContent.CorrectWordList[0]);
+                    Console.WriteLine(wordContent.AssumCorrectList[0]);
                 }
-                else 
+                else
                 {
-                    string str = "{" + wordContent.CorrectWordList[0] + " " + wordContent.CorrectWordList[1] + "}";
+                    string str = "{" + wordContent.AssumCorrectList[0] + " " + wordContent.AssumCorrectList[1] + "}";
                     Console.WriteLine(str);
                 }
                 if (wordContent.type == TypeOfError.notFound)
                 {
-                    string str = "{" + wordContent.value + "?" +"}";
+                    string str = "{" + wordContent.value + "?" + "}";
                 }
             }
         }
@@ -92,39 +96,146 @@ namespace CQG
         {
             char[] errorW = word.value.ToCharArray();
             char[] DictW = Dict.ToCharArray();
+            int len = 0;
             int difference = 0;
             // сравнение большего слова с меньшим (словарное больше)
-            //if (Dict.Length >= word.value.Length)
-            //{
-                foreach (var L in errorW)
+          
+            foreach (var L in errorW)
+            {
+                if (!DictW.Contains(L))
                 {
-                    if (!DictW.Contains(L))
-                    {
-                        difference++;
-                        if (difference >= 2) return;
-                    }
+                    difference++;
+                    if (difference >= 2) return;
                 }
+            }
+            foreach (var L in DictW)
+            {
+                if (!errorW.Contains(L))
+                {
+                    difference++;
+                    if (difference > 2) return;
+                }
+            }
 
-                //добавление словарного слова , на которое заменим позже
-                word.CorrectWordList.Add(Dict);
-                //word.type = TypeOfError.insert;// словарное слово больше , значит вставка буквы
-            //}
-            //else
-            //{
-            //    // сравнение большего слова с меньшим (словарное меньше)
-            //    foreach (var L in DictW)
-            //    {
-            //        if (!errorW.Contains(L))
-            //        {
-            //            difference++;
-            //            if (difference >= 2) return;
-            //        }
-            //    }
-            //    //добавление словарного слова , на которое заменим позже
-            //    word.CorrectWordList.Add(Dict);
-            //    word.type = TypeOfError.delete; // словарное слово меньше , значит удаление 
-            //}
+            word.AssumCorrectList.Add(Dict);
+            if (DictW.Count() < errorW.Count())
+            {
+                word.type = TypeOfError.delete;
+            }
+            else if (DictW.Count() > errorW.Count())
+            {
+                word.type = TypeOfError.insert;
+            }
+            else 
+            {
+                word.type = TypeOfError.exactly;
+            }
+     
         }
 
+        static void SelectioWord(WordElement word)
+        {
+            // если не найдено совпадений в словаре 
+            if (word.AssumCorrectList.Count == 0 || word.AssumCorrectList == null) return;
+            if (word.AssumCorrectList.Count > 0)
+            {
+                //если наше слово уже словарное , проверить на совпадения в найденых и просто завершиться 
+                if (word.AssumCorrectList.Contains(word.value))
+                {
+                    return;
+                }
+                else
+                {
+                    //сравниваем с найденными словами и смотрим отличие от них 
+                    for (var item = 0; item < word.AssumCorrectList.Count(); item++)
+                    {
+                        if (word.value.Length < word.AssumCorrectList[item].Length)
+                        {
+                            List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
+                            List<char> wordValue = new List<char>(word.value.ToCharArray());
+                            for (int letter = 0; letter < wordValue.Count(); letter++)
+                            {
+                                if (wordValue.Contains(assumeWord[letter]))
+                                {
+                                    wordValue.Remove(assumeWord[letter]);
+                                    wordValue.Remove(assumeWord[letter]);
+                                }
+                            }
+                            if (assumeWord.Count == 1)
+                            {
+                                word.CorrertWords.Add(word.AssumCorrectList[item]);
+                            }
+                            else
+                            {
+                                word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
+                                continue;
+                            }
+
+                        }
+                        if (word.value.Length > word.AssumCorrectList[item].Length)
+                        {
+                            List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
+                            List<char> wordValue = new List<char>(word.value.ToCharArray());
+                            for (int letter = 0; letter < assumeWord.Count(); letter++)
+                            {
+                                if (wordValue.Contains(assumeWord[letter]))
+                                {
+                                    wordValue.Remove(assumeWord[letter]);
+                                    wordValue.Remove(assumeWord[letter]);
+                                }
+                            }
+                            if (wordValue.Count == 1)
+                            {
+                                word.CorrertWords.Add(word.AssumCorrectList[item]);
+                                continue;
+                            }
+                            else
+                            {
+                                  word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
+                            }
+                        }
+                        if (word.value.Length == word.AssumCorrectList[item].Length)
+                        {
+                            List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
+                            List<char> wordValue = new List<char>(word.value.ToCharArray());
+                            for (int letter = assumeWord.Count()-1; letter >= 0; letter--)
+                            {
+                                if (wordValue.Contains(assumeWord[letter]))
+                                {
+                                    wordValue.Remove(assumeWord[letter]);
+                                    assumeWord.Remove(assumeWord[letter]);
+                                }
+                            }
+                            if (wordValue.Count == 0 || (word.AssumCorrectList.Count()==1 && wordValue.Count == 1))
+                            {
+                                word.CorrertWords.Add(word.AssumCorrectList[item]);
+                                word.type = TypeOfError.bothEdits;
+                            }
+                            else
+                            {
+                                 word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
+                                continue;
+                            }
+                        }
+                    }
+                    if (word.CorrertWords.Count() > 1)
+                    {
+                        string finalString = "{";
+                        foreach (var Word in word.CorrertWords)
+                        {
+                            finalString += (" " + word);
+                        }
+                    }
+                    if (word.CorrertWords.Count() == 1)
+                    {
+                        word.value = word.CorrertWords[0];
+                    }
+                    if (word.CorrertWords.Count() == 0 || word.CorrertWords == null)
+                    {
+                        word.value = "{" + word.value + "?" +"}";
+                    }
+                }
+            }
+        }
     }
 }
