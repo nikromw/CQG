@@ -9,10 +9,11 @@ namespace CQG
     {
         static List<string> Dict = new List<string>();
         static List<WordElement> Content = new List<WordElement>();
+        static List<int> format = new List<int>();
 
         static void Main(string[] args)
         {
-            int count = 0;
+            int count = 0 , formatting = 0;
             List<string> inputData = new List<string>();
             while (count != 2)
             {
@@ -24,28 +25,22 @@ namespace CQG
                 inputData.Add(str);
             }
             SplitRows(inputData);
-            foreach (var wordContent in Content)
+            Format(inputData);
+            if (Content.Count() != 0 && Content != null)
             {
-                FindWord(wordContent);
-            }
-            foreach (var wordContent in Content)
-            {
-                SelectioWord(wordContent);
-            }
-            foreach (var wordContent in Content)
-            {
-                if (wordContent.AssumCorrectList.Count == 1)
+                foreach (var wordContent in Content)
                 {
-                    Console.WriteLine(wordContent.AssumCorrectList[0]);
+                    FindWord(wordContent);
                 }
-                else
+                foreach (var wordContent in Content)
                 {
-                    string str = "{" + wordContent.AssumCorrectList[0] + " " + wordContent.AssumCorrectList[1] + "}";
-                    Console.WriteLine(str);
+                    SelectioWord(wordContent);
                 }
-                if (wordContent.type == TypeOfError.notFound)
+                foreach (var wordContent in Content)
                 {
-                    string str = "{" + wordContent.value + "?" + "}";
+                    Console.Write(wordContent.value);
+                    formatting++;
+                    if (format.Contains(formatting)) Console.WriteLine();
                 }
             }
         }
@@ -229,13 +224,30 @@ namespace CQG
                         {
                             finalString += (  Word+ " ");
                         }
-                        word.value = finalString + "}";
+                        word.value = finalString + "} ";
                     }
                     if (word.CorrertWords.Count() == 1)
                     {
                         word.value = word.CorrertWords[0];
                     }
                 }
+            }
+        }
+
+        static void Format(List<string> str)
+        {
+            bool content = false;
+            int counter = 0;
+            foreach (var i in str)
+            {
+                if (i == "===")
+                {
+                    content = true;
+                    continue;
+                }
+                    if (!content) continue;
+                format.Add(i.Split(" ").Count() + counter );
+                counter += i.Split(" ").Count();
             }
         }
     }
