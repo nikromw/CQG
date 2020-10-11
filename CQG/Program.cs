@@ -10,11 +10,13 @@ namespace CQG
         static List<string> Dict = new List<string>();
         static List<WordElement> Content = new List<WordElement>();
         static List<int> format = new List<int>();
-
+        public delegate void WordsHandler(object obj);
         static void Main(string[] args)
         {
-            int count = 0 , formatting = 0;
+            int count = 0, formatting = 0;
             List<string> inputData = new List<string>();
+            WordsHandler handler = new WordsHandler(FindWord);
+            handler += SelectioWord;
             while (count != 2)
             {
                 var str = Console.ReadLine();
@@ -28,20 +30,20 @@ namespace CQG
             Format(inputData);
             if (Content.Count() != 0 && Content != null)
             {
+                 long ellapledTicks = DateTime.Now.Ticks;
                 foreach (var wordContent in Content)
                 {
-                    FindWord(wordContent);
+                    Thread wordSearchThread = new Thread(new ParameterizedThreadStart(handler));
+                    wordSearchThread.Start(wordContent);
                 }
-                foreach (var wordContent in Content)
-                {
-                    SelectioWord(wordContent);
-                }
+                 ellapledTicks = DateTime.Now.Ticks - ellapledTicks;
                 foreach (var wordContent in Content)
                 {
                     Console.Write(wordContent.value + " ");
                     formatting++;
                     if (format.Contains(formatting)) Console.WriteLine();
                 }
+                 Console.WriteLine(ellapledTicks);
             }
         }
 
@@ -78,15 +80,16 @@ namespace CQG
             }
         }
         //ищем совпадение по размеру слова +-1 буква , иначе не интересует
-        static void FindWord(WordElement word)
+        public static void FindWord(object word)
         {
             foreach (var DictWord in Dict)
             {
-                if (Math.Abs(DictWord.Length - word.value.Length) < 2)
+                if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
                 {
-                    CompareWords(word, DictWord);
+                    CompareWords((WordElement)word, DictWord);
                 }
             }
+
         }
         //итерируемся побуквенно по словарному слову и слову с ошибкой 
         // меньшее по длинне слово точно содержиться в большем
@@ -131,8 +134,10 @@ namespace CQG
 
         }
 
-        static void SelectioWord(WordElement word)
+        static void SelectioWord(object TmpWord)
         {
+            WordElement word;
+            word = (WordElement)TmpWord;
             // если не найдено совпадений в словаре 
             if (word.AssumCorrectList.Count == 0 || word.AssumCorrectList == null)
             {
@@ -149,7 +154,7 @@ namespace CQG
                 else
                 {
                     //сравниваем с найденными словами и смотрим отличие от них 
-                    for (var item = word.AssumCorrectList.Count()-1; item >=0; item--)
+                    for (var item = word.AssumCorrectList.Count() - 1; item >= 0; item--)
                     {
                         if (word.value.Length < word.AssumCorrectList[item].Length && word.type != TypeOfError.bothEdits)
                         {
@@ -174,7 +179,7 @@ namespace CQG
                             }
 
                         }
-                        if (word.value.Length > word.AssumCorrectList[item].Length && word.type != TypeOfError.bothEdits  )
+                        if (word.value.Length > word.AssumCorrectList[item].Length && word.type != TypeOfError.bothEdits)
                         {
                             List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
                             List<char> wordValue = new List<char>(word.value.ToCharArray());
@@ -223,9 +228,9 @@ namespace CQG
                     if (word.CorrertWords.Count() > 1)
                     {
                         string finalString = "{";
-                        for (int i =0; i< word.CorrertWords.Count();i++)
+                        for (int i = 0; i < word.CorrertWords.Count(); i++)
                         {
-                            if (i == word.CorrertWords.Count()-1)
+                            if (i == word.CorrertWords.Count() - 1)
                             {
                                 finalString += word.CorrertWords[i];
                             }
@@ -242,6 +247,7 @@ namespace CQG
                     }
                 }
             }
+
         }
 
         static void Format(List<string> str)
@@ -255,8 +261,8 @@ namespace CQG
                     content = true;
                     continue;
                 }
-                    if (!content) continue;
-                format.Add(i.Split(" ").Count() + counter );
+                if (!content) continue;
+                format.Add(i.Split(" ").Count() + counter);
                 counter += i.Split(" ").Count();
             }
         }

@@ -1,4 +1,3 @@
-C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.csprojAssemblyReference.cache
 C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.csproj.CoreCompileInputs.cache
 C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.AssemblyInfoInputs.cache
 C:\Users\Salvador\source\repos\CQG\CQG\obj\Debug\netcoreapp3.1\CQG.AssemblyInfo.cs
