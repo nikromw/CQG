@@ -61,15 +61,18 @@ namespace CQG
                 {
                     foreach (var word in i.Split(' '))
                     {
-                        Dict.Add(word);
+                        Dict.Add(word.ToLower());
                     }
                 }
                 else
                 {
                     foreach (var word in i.Split(' '))
                     {
-                        WordElement tmp = new WordElement(word);
-                        Content.Add(tmp);
+                        if (word != "")
+                        {
+                            WordElement tmp = new WordElement(word);
+                            Content.Add(tmp);
+                        }
                     }
                 }
             }
@@ -139,7 +142,7 @@ namespace CQG
             if (word.AssumCorrectList.Count > 0)
             {
                 //если наше слово уже словарное , проверить на совпадения в найденых и просто завершиться 
-                if (word.AssumCorrectList.Contains(word.value))
+                if (word.AssumCorrectList.Contains(word.value.ToLower()))
                 {
                     return;
                 }
@@ -220,15 +223,15 @@ namespace CQG
                     if (word.CorrertWords.Count() > 1)
                     {
                         string finalString = "{";
-                        foreach (var Word in word.CorrertWords)
+                        for (int i =0; i< word.CorrertWords.Count();i++)
                         {
-                            if (Word == word.CorrertWords.Last())
+                            if (i == word.CorrertWords.Count()-1)
                             {
-                                finalString += Word;
+                                finalString += word.CorrertWords[i];
                             }
                             else
                             {
-                                finalString += Word + " ";
+                                finalString += word.CorrertWords[i] + " ";
                             }
                         }
                         word.value = finalString + "}";
