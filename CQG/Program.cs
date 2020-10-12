@@ -12,7 +12,8 @@ namespace CQG
         static List<int> format = new List<int>();
         static public List<Thread> threads = new List<Thread>();
         public delegate void WordsHandler(object obj);
-        static Semaphore sem = new Semaphore(8,8);
+        static Semaphore sem = new Semaphore(8, 8);
+        static bool done = false;
         static void Main(string[] args)
         {
             int count = 0, formatting = 0;
@@ -40,9 +41,11 @@ namespace CQG
                         threads.Add(wordSearchThread);
                         wordSearchThread.Start(wordContent);
                     }
+                Thread checkThread = new Thread(CheckThreads);
                 }
                 else
                 {
+                    done = true;
                     foreach (var wordContent in Content)
                     {
                         FindWord(wordContent);
@@ -52,16 +55,36 @@ namespace CQG
                         SelectioWord(wordContent);
                     }
                 }
-               
-                    foreach (var wordContent in Content)
+                while (true)
+                {
+                    if (done)
                     {
-                        Console.Write(wordContent.value + " ");
-                        formatting++;
-                        if (format.Contains(formatting)) Console.WriteLine();
+                        foreach (var wordContent in Content)
+                        {
+                            Console.Write(wordContent.value + " ");
+                            formatting++;
+                            if (format.Contains(formatting)) Console.WriteLine();
+                        }
+                        return;
                     }
+                }
             }
         }
 
+        public static void CheckThreads()
+        {
+            while (true)
+            {
+                foreach (var thread in threads)
+                {
+                    if (!thread.IsAlive)
+                    {
+                        break;
+                    }
+                }
+                done = true;
+            }
+        }
         //делим строки на словарь и контекст 
         //создаем листы со словами из словаря и неверных слов
         static void SplitRows(List<string> str)
@@ -97,15 +120,15 @@ namespace CQG
         //ищем совпадение по размеру слова +-1 буква , иначе не интересует
         public static void FindWord(object word)
         {
-             sem.WaitOne();
-                foreach (var DictWord in Dict)
+            sem.WaitOne();
+            foreach (var DictWord in Dict)
+            {
+                if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
                 {
-                    if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
-                    {
-                        CompareWords((WordElement)word, DictWord);
-                    }
+                    CompareWords((WordElement)word, DictWord);
                 }
-                sem.Release();
+            }
+            sem.Release();
         }
         //итерируемся побуквенно по словарному слову и слову с ошибкой 
         // меньшее по длинне слово точно содержиться в большем
@@ -126,7 +149,7 @@ namespace CQG
             }
             foreach (var L in DictW)
             {
-                
+
                 if (!errorW.Contains(L))
                 {
                     difference++;
