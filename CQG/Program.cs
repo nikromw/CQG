@@ -10,8 +10,9 @@ namespace CQG
         static List<string> Dict = new List<string>();
         static List<WordElement> Content = new List<WordElement>();
         static List<int> format = new List<int>();
+        static public List<Thread> threads = new List<Thread>();
         public delegate void WordsHandler(object obj);
-        static Semaphore sem = new Semaphore(10,10);
+        static Semaphore sem = new Semaphore(8,8);
         static void Main(string[] args)
         {
             int count = 0, formatting = 0;
@@ -31,20 +32,33 @@ namespace CQG
             Format(inputData);
             if (Content.Count() != 0 && Content != null)
             {
-                if (Dict.Count() > 100)
+                if (Dict.Count() > 200)
                 {
                     foreach (var wordContent in Content)
                     {
                         Thread wordSearchThread = new Thread(new ParameterizedThreadStart(handler));
+                        threads.Add(wordSearchThread);
                         wordSearchThread.Start(wordContent);
                     }
                 }
-                foreach (var wordContent in Content)
+                else
                 {
-                    Console.Write(wordContent.value + " ");
-                    formatting++;
-                    if (format.Contains(formatting)) Console.WriteLine();
+                    foreach (var wordContent in Content)
+                    {
+                        FindWord(wordContent);
+                    }
+                    foreach (var wordContent in Content)
+                    {
+                        SelectioWord(wordContent);
+                    }
                 }
+               
+                    foreach (var wordContent in Content)
+                    {
+                        Console.Write(wordContent.value + " ");
+                        formatting++;
+                        if (format.Contains(formatting)) Console.WriteLine();
+                    }
             }
         }
 
@@ -83,9 +97,7 @@ namespace CQG
         //ищем совпадение по размеру слова +-1 буква , иначе не интересует
         public static void FindWord(object word)
         {
-            if (Dict.Count() >= 100)
-            {
-                sem.WaitOne();
+             sem.WaitOne();
                 foreach (var DictWord in Dict)
                 {
                     if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
@@ -93,19 +105,7 @@ namespace CQG
                         CompareWords((WordElement)word, DictWord);
                     }
                 }
-
                 sem.Release();
-            }
-            else 
-            {
-                foreach (var DictWord in Dict)
-                {
-                    if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
-                    {
-                        CompareWords((WordElement)word, DictWord);
-                    }
-                }
-            }
         }
         //итерируемся побуквенно по словарному слову и слову с ошибкой 
         // меньшее по длинне слово точно содержиться в большем
