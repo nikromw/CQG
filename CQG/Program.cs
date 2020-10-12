@@ -41,7 +41,7 @@ namespace CQG
                         threads.Add(wordSearchThread);
                         wordSearchThread.Start(wordContent);
                     }
-                Thread checkThread = new Thread(CheckThreads);
+                    Thread checkThread = new Thread(CheckThreads);
                     checkThread.Start();
                 }
                 else
@@ -126,7 +126,7 @@ namespace CQG
             sem.WaitOne();
             foreach (var DictWord in Dict)
             {
-                if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
+                if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) <= 2)
                 {
                     CompareWords((WordElement)word, DictWord);
                 }
@@ -147,7 +147,7 @@ namespace CQG
                 if (!DictW.Contains(L))
                 {
                     difference++;
-                    if (difference >= 2) return;
+                    if (difference >= 3) return;
                 }
             }
             foreach (var L in DictW)
@@ -161,18 +161,18 @@ namespace CQG
             }
 
             word.AssumCorrectList.Add(Dict);
-            if (DictW.Count() < errorW.Count())
-            {
-                word.type = TypeOfError.delete;
-            }
-            else if (DictW.Count() > errorW.Count())
-            {
-                word.type = TypeOfError.insert;
-            }
-            else
-            {
-                word.type = TypeOfError.exactly;
-            }
+            //if (DictW.Count() < errorW.Count())
+            //{
+            //    word.type = TypeOfError.delete;
+            //}
+            //else if (DictW.Count() > errorW.Count())
+            //{
+            //    word.type = TypeOfError.insert;
+            //}
+            //else
+            //{
+            //    word.type = TypeOfError.exactly;
+            //}
 
         }
 
@@ -210,14 +210,16 @@ namespace CQG
                                     assumeWord.Remove(assumeWord[letter]);
                                 }
                             }
-                            if (assumeWord.Count == 1)
+                            if (assumeWord.Count <= 2)
                             {
-                                word.CorrertWords.Add(word.AssumCorrectList[item]);
-                            }
-                            else
-                            {
-                                word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
-                                continue;
+                                if (assumeWord.Count == 2)
+                                {
+                                    word.CorrectWordsTwoEdit.Add(word.AssumCorrectList[item]);
+                                }
+                                else if (assumeWord.Count == 1)
+                                {
+                                    word.CorrectWordsOneEdit.Add(word.AssumCorrectList[item]);
+                                }
                             }
 
                         }
@@ -227,20 +229,22 @@ namespace CQG
                             List<char> wordValue = new List<char>(word.value.ToCharArray());
                             for (int letter = assumeWord.Count() - 1; letter >= 0; letter--)
                             {
-                                if (wordValue.Contains(assumeWord[letter]))
+                                if (assumeWord.Contains(assumeWord[letter]))
                                 {
                                     wordValue.Remove(assumeWord[letter]);
                                     assumeWord.Remove(assumeWord[letter]);
                                 }
                             }
-                            if (wordValue.Count == 1)
+                            if (wordValue.Count <= 2)
                             {
-                                word.CorrertWords.Add(word.AssumCorrectList[item]);
-                                continue;
-                            }
-                            else
-                            {
-                                word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
+                                if (wordValue.Count() == 2)
+                                {
+                                    word.CorrectWordsTwoEdit.Add(word.AssumCorrectList[item]);
+                                }
+                                else if (wordValue.Count() == 1)
+                                {
+                                    word.CorrectWordsOneEdit.Add(word.AssumCorrectList[item]);
+                                }
                             }
                         }
                         if (word.value.Length == word.AssumCorrectList[item].Length)
@@ -257,36 +261,50 @@ namespace CQG
                             }
                             if (wordValue.Count == 0 || (word.AssumCorrectList.Count() == 1 && wordValue.Count == 1))
                             {
-                                word.CorrertWords.Add(word.AssumCorrectList[item]);
+                                word.CorrectWordsTwoEdit.Add(word.AssumCorrectList[item]);
                                 word.type = TypeOfError.bothEdits;
                             }
-                            else
-                            {
-                                word.AssumCorrectList.Remove(word.AssumCorrectList[item]);
-                                continue;
-                            }
                         }
                     }
-                    if (word.CorrertWords.Count() > 1)
+                    string finalString = "{";
+                    if (word.CorrectWordsTwoEdit.Count() > 1)
                     {
-                        string finalString = "{";
-                        for (int i = 0; i < word.CorrertWords.Count(); i++)
+                            for (int i = 0; i < word.CorrectWordsTwoEdit.Count(); i++)
+                            {
+                                if (i == word.CorrectWordsTwoEdit.Count() - 1)
+                                {
+                                    finalString += word.CorrectWordsTwoEdit[i];
+                                }
+                                else
+                                {
+                                    finalString += word.CorrectWordsTwoEdit[i] + " ";
+                                }
+                            }
+                    }
+                    if (word.CorrectWordsOneEdit.Count() > 1)
+                    {
+                        for (int i = 0; i < word.CorrectWordsOneEdit.Count(); i++)
                         {
-                            if (i == word.CorrertWords.Count() - 1)
+                            if (i == word.CorrectWordsOneEdit.Count() - 1)
                             {
-                                finalString += word.CorrertWords[i];
+                                finalString += word.CorrectWordsOneEdit[i];
                             }
                             else
                             {
-                                finalString += word.CorrertWords[i] + " ";
+                                finalString += word.CorrectWordsOneEdit[i] + " ";
                             }
                         }
-                        word.value = finalString + "}";
                     }
-                    if (word.CorrertWords.Count() == 1)
+
+                    word.value = finalString + "}";
+                    if (word.CorrectWordsTwoEdit.Count() == 1)
                     {
-                        word.value = word.CorrertWords[0];
-                    }
+                            word.value = word.CorrectWordsTwoEdit[0];
+                    } 
+                    if (word.CorrectWordsOneEdit.Count() == 1)
+                        {
+                            word.value = word.CorrectWordsOneEdit[0];
+                        }
                 }
             }
 

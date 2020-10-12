@@ -9,6 +9,8 @@ namespace CQG
         exactly,
         delete,
         insert,
+        doubleInsert,
+        doubleDelete,
         notFound,
         bothEdits,
         ambiguity
@@ -18,9 +20,9 @@ namespace CQG
     {
         public string value { get; set; }
         public TypeOfError type { get; set; }
-        public int countOfMatches = 0;
         public List<string> AssumCorrectList = new List<string>();
-        public List<string> CorrertWords = new List<string>();
+        public List<string> CorrectWordsOneEdit = new List<string>();
+        public List<string> CorrectWordsTwoEdit = new List<string>();
         public WordElement(string _value)
         {
             value = _value;
