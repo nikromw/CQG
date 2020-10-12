@@ -42,6 +42,7 @@ namespace CQG
                         wordSearchThread.Start(wordContent);
                     }
                 Thread checkThread = new Thread(CheckThreads);
+                    checkThread.Start();
                 }
                 else
                 {
@@ -75,15 +76,17 @@ namespace CQG
         {
             while (true)
             {
-                foreach (var thread in threads)
+                int WorkCount = 0;
+
+                for (int i = 0; i < threads.Count; i++)
                 {
-                    if (!thread.IsAlive)
-                    {
-                        break;
-                    }
+                    WorkCount += (threads[i].IsAlive) ? 0 : 1;
                 }
-                done = true;
+
+                if (WorkCount == threads.Count)
+                    break;
             }
+            done = true;
         }
         //делим строки на словарь и контекст 
         //создаем листы со словами из словаря и неверных слов
