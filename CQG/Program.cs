@@ -181,13 +181,22 @@ namespace CQG
             string sample = new string(charArr.ToArray());
             if (word.value.Length > assumeWord.Length)
             {
-                //if (word.value.Trim(sample.ToCharArray()) != assumeWord)
-                //{
-                //    return false;
-                //}
-                if (word.value.IndexOf(sample) < 0)
-                {
+                
+                if (word.value.IndexOf(sample) < 0  )
+                { List<char> wordCompareList = new List<char>();
+                    foreach(var ch in word.value.ToArray())
+                    { 
+                        if (ch!= charArr[0] || ch != charArr[1])
+                        {
+                            wordCompareList.Add(ch);
+                        }
+                    }
+                    var compareWord = new string(wordCompareList.ToArray());
+                    if (assumeWord == compareWord)
+                    { 
+                    
                     return true;
+                    }
                 }
                 else
                 {
@@ -196,13 +205,11 @@ namespace CQG
             }
             else
             {
-                //if (assumeWord.Trim(sample.ToCharArray()) != word.value)
-                //{
-                //    return false;
-                //}
+                
                 if (assumeWord.IndexOf(sample) < 0)
-                {
+                { 
                     return true;
+                    
                 }
                 else
                 {
@@ -217,10 +224,6 @@ namespace CQG
             string sample = new string(charArr.ToArray());
             if (word.value.Length > assumeWord.Length)
             {
-                //if (word.value.Trim(sample.ToCharArray()) == assumeWord)
-                //{
-                //    return true;
-                //}
 
             List<char> wordValArr = new List<char>();
                 foreach (var ch in word.value.ToCharArray())
@@ -300,7 +303,7 @@ namespace CQG
                     //сравниваем с найденными словами и смотрим отличие от них 
                     for (var item = word.AssumCorrectList.Count() - 1; item >= 0; item--)
                     {
-                        if (word.value.Length < word.AssumCorrectList[item].Length && word.type != TypeOfError.bothEdits)
+                        if (word.value.Length < word.AssumCorrectList[item].Length /*&& word.type != TypeOfError.bothEdits*/)
                         {
                             List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
                             List<char> wordValue = new List<char>(word.value.ToCharArray());
@@ -332,7 +335,7 @@ namespace CQG
                             }
 
                         }
-                        if (word.value.Length > word.AssumCorrectList[item].Length && word.type != TypeOfError.bothEdits)
+                        if (word.value.Length > word.AssumCorrectList[item].Length /*&& word.type != TypeOfError.bothEdits*/)
                         {
                             List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
                             List<char> wordValue = new List<char>(word.value.ToCharArray());
