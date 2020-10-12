@@ -11,6 +11,7 @@ namespace CQG
         static List<WordElement> Content = new List<WordElement>();
         static List<int> format = new List<int>();
         public delegate void WordsHandler(object obj);
+        static Semaphore sem = new Semaphore(10,10);
         static void Main(string[] args)
         {
             int count = 0, formatting = 0;
@@ -30,20 +31,20 @@ namespace CQG
             Format(inputData);
             if (Content.Count() != 0 && Content != null)
             {
-                 long ellapledTicks = DateTime.Now.Ticks;
-                foreach (var wordContent in Content)
+                if (Dict.Count() > 100)
                 {
-                    Thread wordSearchThread = new Thread(new ParameterizedThreadStart(handler));
-                    wordSearchThread.Start(wordContent);
+                    foreach (var wordContent in Content)
+                    {
+                        Thread wordSearchThread = new Thread(new ParameterizedThreadStart(handler));
+                        wordSearchThread.Start(wordContent);
+                    }
                 }
-                 ellapledTicks = DateTime.Now.Ticks - ellapledTicks;
                 foreach (var wordContent in Content)
                 {
                     Console.Write(wordContent.value + " ");
                     formatting++;
                     if (format.Contains(formatting)) Console.WriteLine();
                 }
-                 Console.WriteLine(ellapledTicks);
             }
         }
 
@@ -82,11 +83,27 @@ namespace CQG
         //ищем совпадение по размеру слова +-1 буква , иначе не интересует
         public static void FindWord(object word)
         {
-            foreach (var DictWord in Dict)
+            if (Dict.Count() >= 100)
             {
-                if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
+                sem.WaitOne();
+                foreach (var DictWord in Dict)
                 {
-                    CompareWords((WordElement)word, DictWord);
+                    if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
+                    {
+                        CompareWords((WordElement)word, DictWord);
+                    }
+                }
+
+                sem.Release();
+            }
+            else 
+            {
+                foreach (var DictWord in Dict)
+                {
+                    if (Math.Abs(DictWord.Length - ((WordElement)word).value.Length) < 2)
+                    {
+                        CompareWords((WordElement)word, DictWord);
+                    }
                 }
             }
         }
@@ -96,7 +113,6 @@ namespace CQG
         {
             char[] errorW = word.value.ToCharArray();
             char[] DictW = Dict.ToCharArray();
-            int len = 0;
             int difference = 0;
             // сравнение большего слова с меньшим (словарное больше)
 
@@ -110,6 +126,7 @@ namespace CQG
             }
             foreach (var L in DictW)
             {
+                
                 if (!errorW.Contains(L))
                 {
                     difference++;
