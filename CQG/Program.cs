@@ -69,9 +69,10 @@ namespace CQG
                             formatting++;
                             if (format.Contains(formatting)) Console.WriteLine();
                         }
-                        return;
+                        break;
                     }
                 }
+                Console.ReadKey();
             }
         }
 
