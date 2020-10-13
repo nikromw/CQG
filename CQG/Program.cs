@@ -23,9 +23,12 @@ namespace CQG
             while (count != 2)
             {
                 var str = Console.ReadLine();
-                if (str == "===")
+                string freeFormat = str;
+                //проверка положения "==="
+                if (freeFormat.Replace(" ", "") == "===" || freeFormat.Replace("\t", "") == "===")
                 {
                     count++;
+                    if (count == 2) break;
                 }
                 inputData.Add(str);
             }
@@ -92,7 +95,7 @@ namespace CQG
         //создаем листы со словами из словаря и неверных слов
         static void SplitRows(List<string> str)
         {
-            bool content = false; ;
+            bool content = false; 
             foreach (var i in str)
             {
                 if (i == "===")
@@ -161,18 +164,7 @@ namespace CQG
             }
 
             word.AssumCorrectList.Add(Dict);
-            //if (DictW.Count() < errorW.Count())
-            //{
-            //    word.type = TypeOfError.delete;
-            //}
-            //else if (DictW.Count() > errorW.Count())
-            //{
-            //    word.type = TypeOfError.insert;
-            //}
-            //else
-            //{
-            //    word.type = TypeOfError.exactly;
-            //}
+        
 
         }
         // проверяем , чтобы две вставки или удаления не стояли рядом 
@@ -335,7 +327,7 @@ namespace CQG
                             }
 
                         }
-                        if (word.value.Length > word.AssumCorrectList[item].Length /*&& word.type != TypeOfError.bothEdits*/)
+                        if (word.value.Length > word.AssumCorrectList[item].Length )
                         {
                             List<char> assumeWord = new List<char>(word.AssumCorrectList[item].ToCharArray());
                             List<char> wordValue = new List<char>(word.value.ToCharArray());
